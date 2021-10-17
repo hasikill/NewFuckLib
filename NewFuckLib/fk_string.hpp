@@ -121,6 +121,19 @@ namespace fk
 			return std::regex_replace(*this, re, "");
 		}
 
+		fk::string hexstring(const char* patterns = " ", bool isupper = false)
+		{
+			fk::string ret = "";
+			for (auto ch : *this)
+			{
+				char tmp[16];
+				sprintf_s(tmp, isupper ? "%02X" : "%02x", (uint8_t)ch);
+				ret += tmp;
+				ret += patterns;
+			}
+			return ret;
+		}
+
 		template <typename T>
 		T number()
 		{

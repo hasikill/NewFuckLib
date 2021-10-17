@@ -24,6 +24,9 @@
     <ClInclude Include="fk_string.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="fk_crypto.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

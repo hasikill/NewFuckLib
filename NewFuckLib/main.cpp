@@ -2,6 +2,7 @@
 #include "fk_log.hpp"
 #include "fk_file.hpp"
 #include "fk_string.hpp"
+#include "fk_crypto.hpp"
 
 int main()
 {
@@ -36,16 +37,34 @@ int main()
 
 	// 日志库
 	fk::log log = fk::log(
-		FK_LOGTYPE_PRE_FILE |
-		fk::log::fkLogType::console |
-		fk::log::fkLogType::dbgview,
-		"a.log", nullptr, false
+		FK_LOGTYPE_DEFAULT | fk::log::fkLogType::file,
+		"a.log", "123456", false
 	);
 	log.put_successf("hello.");
 	log.put_successf("hello1.");
 	log.put_successf("hello2.");
 	log.put_failedf("hello3.");
 	//log.putf("hh = %d", 1);
+
+	// 加密解密
+	// base64
+	fk::string a = fk::crypto_utils::base64_encode("123456", 6);
+	std::cout << a << std::endl;
+	std::cout << fk::crypto_utils::base64_decode(a.c_str(), a.size()) << std::endl;
+
+	//base16
+	fk::string b = fk::crypto_utils::base16_encode("123456", 6);
+	std::cout << b << std::endl;
+	std::cout << fk::crypto_utils::base16_decode(b.c_str(), b.size()) << std::endl;
+
+	char plain_text[] = "There are moments in life when you miss someone so much that you just want to pick them from your dreams and hug them for real! Dream what you want to dream;go where you want to go;be what you want to";
+	char user_key[] = "123456";
+	// rc4
+
+	// rc6
+	fk::string ciphertext = fk::crypto_utils::rc6_encode(plain_text, sizeof(plain_text), user_key);
+	std::cout << ciphertext.hexstring() << std::endl;
+	std::cout << fk::crypto_utils::rc6_decode(ciphertext.c_str(), ciphertext.size(), user_key) << std::endl;
 
 	return 0;
 }

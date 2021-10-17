@@ -1,13 +1,15 @@
 ﻿#pragma once
-#include "fk_file.hpp"
 #include <stdint.h>
 #include <Windows.h>
 #include <chrono>
+#include "fk_file.hpp"
+#include "fk_crypto.hpp"
 
 #define FK_LOG_VERSION "1.0"
 #define FK_LOGTYPE_DEFAULT		(fk::log::fkLogType::prefix | fk::log::fkLogType::console)
 #define FK_LOGTYPE_PRE_FILE		(fk::log::fkLogType::prefix | fk::log::fkLogType::file)
 #define FK_LOGTYPE_PRE_DBGVIEW	(fk::log::fkLogType::prefix | fk::log::fkLogType::dbgview)
+#define FK_LOGTYPE_ALL			(fk::log::fkLogType::prefix | fk::log::fkLogType::file | fk::log::fkLogType::console |fk::log::fkLogType::dbgview | fk::log::fkLogType::encrypt)
 
 namespace fk
 {
@@ -80,7 +82,13 @@ namespace fk
 			if (m_log_ctl.ctl.encrypt)
 			{
 				if (m_log_passwd.empty())
-					throw "'encrypt' mask is used but no password is specified.";
+				{
+					const char* err = "'encrypt' mask is used but no password is specified.\n";
+					OutputDebugStringA(err);
+					throw err;
+				}
+				fk::string ciphertext = fk::crypto_utils::rc6_encode(ctx.c_str(), ctx.size(), m_log_passwd);
+				ctx = "*" + fk::crypto_utils::base16_encode(ciphertext.c_str(), ciphertext.size()) + "*";
 			}
 
 			// 添加前缀
@@ -94,7 +102,11 @@ namespace fk
 			if (m_log_ctl.ctl.file)
 			{
 				if (m_log_file.m_fp == nullptr)
-					throw "'file' mask is used but no file path is specified.";
+				{
+					const char* err = "'file' mask is used but no file path is specified.\n";
+					OutputDebugStringA(err);
+					throw err;
+				}
 
 				m_log_file.write(ctx);
 			}
@@ -137,14 +149,30 @@ namespace fk
 			return putf(str.c_str());
 		}
 
-		log& put_successf(const char* str, ...)
+		log& put_successf(const char* fmt, ...)
 		{
-			return put(fk::string::fmtstr("(+) %s", str));
+			const int fmt_buf_size = 1024 * 10;
+			char* buffer = new char[fmt_buf_size];
+			va_list args;
+			va_start(args, fmt);
+			vsprintf_s(buffer, fmt_buf_size, fmt, args);
+			va_end(args);
+			put(fk::string::fmtstr("(+) %s", buffer));
+			delete buffer;
+			return *this;
 		}
 
-		log& put_failedf(const char* str, ...)
+		log& put_failedf(const char* fmt, ...)
 		{
-			return put(fk::string::fmtstr("(-) %s", str));
+			const int fmt_buf_size = 1024 * 10;
+			char* buffer = new char[fmt_buf_size];
+			va_list args;
+			va_start(args, fmt);
+			vsprintf_s(buffer, fmt_buf_size, fmt, args);
+			va_end(args);
+			put(fk::string::fmtstr("(-) %s", buffer));
+			delete buffer;
+			return *this;
 		}
 
 		void close()
