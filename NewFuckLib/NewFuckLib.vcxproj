@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="fk_file.hpp" />
     <ClInclude Include="fk_log.hpp" />
+    <ClInclude Include="fk_string.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
