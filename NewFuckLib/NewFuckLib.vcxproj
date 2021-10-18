@@ -95,13 +95,14 @@
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)out\include
-copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include"
+copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
@@ -111,7 +112,8 @@ copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,13 +133,14 @@ copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)out\include
-copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include"
+copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
@@ -147,7 +150,8 @@ copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,13 +167,14 @@ copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)out\include
-copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include"
+copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
@@ -179,7 +184,8 @@ copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -199,13 +205,14 @@ copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </Link>
     <PostBuildEvent>
       <Command>mkdir $(SolutionDir)out\include
-copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include"
-copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include"
+copy "$(ProjectDir)fk.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_define.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_crypto.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_file.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
@@ -215,7 +222,8 @@ copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
