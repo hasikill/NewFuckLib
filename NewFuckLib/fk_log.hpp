@@ -1,9 +1,12 @@
 ﻿#pragma once
+#include <iostream>
 #include <stdint.h>
 #include <Windows.h>
 #include <chrono>
+#include <mutex>
 #include "fk_file.hpp"
 #include "fk_crypto.hpp"
+#include "fk_define.h"
 
 #define FK_LOG_VERSION "1.0"
 #define FK_LOGTYPE_DEFAULT		(fk::log::fkLogType::prefix | fk::log::fkLogType::console)
@@ -42,7 +45,10 @@ namespace fk
 		};
 
 	public:
-		log(fkLogMask msk = FK_LOGTYPE_DEFAULT, const char* filename = nullptr, const char* passwd = nullptr, bool isappend = false)
+		log(fkLogMask msk = FK_LOGTYPE_DEFAULT,
+			const char* filename = nullptr,
+			const char* passwd = nullptr,
+			bool isappend = false)
 		{
 			setmask(msk);
 			setfile(filename, isappend);
@@ -57,7 +63,10 @@ namespace fk
 
 		log& setfile(const char* filename, bool isappend = false)
 		{
-			if (filename == nullptr)
+			if (m_log_ctl.ctl.file == false)
+				return *this;
+
+			if (filename == nullptr || filename == "")
 				return *this;
 
 			m_log_file.open(filename, isappend ? "a+" : "w");
@@ -66,6 +75,9 @@ namespace fk
 
 		log& setpasswd(const char* passwd)
 		{
+			if (m_log_ctl.ctl.encrypt == false)
+				return *this;
+
 			if (passwd == nullptr)
 				return *this;
 
@@ -75,6 +87,7 @@ namespace fk
 
 		log& write(const char* buf, size_t size)
 		{
+			m_log_mtx.lock();
 			// 构建内容
 			fk::string ctx = std::string(buf, size);
 
@@ -123,6 +136,7 @@ namespace fk
 				OutputDebugStringA(ctx.c_str());
 			}
 
+			m_log_mtx.unlock();
 			return *this;
 		}
 
@@ -162,7 +176,7 @@ namespace fk
 			return *this;
 		}
 
-		log& put_failedf(const char* fmt, ...)
+		log& put_errorf(const char* fmt, ...)
 		{
 			const int fmt_buf_size = 1024 * 10;
 			char* buffer = new char[fmt_buf_size];
@@ -178,6 +192,12 @@ namespace fk
 		void close()
 		{
 			m_log_file.close();
+		}
+
+	protected:
+		void settag(fk::string tag)
+		{
+			m_log_tag = tag;
 		}
 
 	private:
@@ -196,17 +216,44 @@ namespace fk
 			GetModuleFileNameA(NULL, full_path, MAX_PATH);
 			str_process_name = fk::string(full_path).suffix("/|\\");
 
-			return fk::string::fmtstr("[ver=%s,time=%s(%lld),pid=%d,tid=%d,name=%s]  ",
-				FK_LOG_VERSION, str_time.c_str(), millsec.count(),
-				GetCurrentProcessId(),
-				GetCurrentThreadId(),
-				str_process_name.c_str()
-			);
+			if (m_log_tag.empty())
+			{
+				return fk::string::fmtstr("[ver=%s,time=%s(%lld),pid=%d,tid=%d,name=%s]  ",
+					FK_LOG_VERSION, str_time.c_str(), millsec.count(),
+					GetCurrentProcessId(),
+					GetCurrentThreadId(),
+					str_process_name.c_str()
+				);
+			}
+			else
+			{
+				return fk::string::fmtstr("[ver=%s,time=%s(%lld),pid=%d,tid=%d,name=%s,tag=%s]  ",
+					FK_LOG_VERSION, str_time.c_str(), millsec.count(),
+					GetCurrentProcessId(),
+					GetCurrentThreadId(),
+					str_process_name.c_str(),
+					m_log_tag.c_str()
+				);
+			}
 		}
 
 	private:
 		fk::file m_log_file;
 		fk::string m_log_passwd;
 		fkLogMask m_log_ctl;
+		fk::string m_log_tag;
+		std::mutex m_log_mtx;
+	};
+
+	class log_utils : protected log
+	{
+	public:
+		log_utils(fk::string tag)
+		{
+			setmask(FK_LOG_UTILS_MASK);
+			setfile(FK_LOG_UTILS_FILENAME, FK_LOG_UTILS_FILE_APPEND);
+			setpasswd(FK_LOG_UTILS_PASSWD);
+			settag(tag);
+		}
 	};
 }

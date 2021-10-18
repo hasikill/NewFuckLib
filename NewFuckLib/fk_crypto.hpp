@@ -10,6 +10,10 @@
 #define RC6_W 32
 #define RC6_R 20
 
+#ifndef max
+#define max(x, y) ((x) > (y) ? (x) : (y));
+#endif
+
 #ifndef M_E
 #define M_E  2.71828182845904523536
 #endif

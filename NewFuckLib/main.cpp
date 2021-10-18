@@ -1,8 +1,5 @@
 #include <iostream>
-#include "fk_log.hpp"
-#include "fk_file.hpp"
-#include "fk_string.hpp"
-#include "fk_crypto.hpp"
+#include "fk.h"
 
 int main()
 {
@@ -36,14 +33,14 @@ int main()
 	std::cout << fk::string("111.222.zip").suffix(".") << std::endl;
 
 	// 日志库
-	fk::log log = fk::log(
+	fk::log log(
 		FK_LOGTYPE_DEFAULT | fk::log::fkLogType::file,
 		"a.log", "123456", false
 	);
 	log.put_successf("hello.");
 	log.put_successf("hello1.");
 	log.put_successf("hello2.");
-	log.put_failedf("hello3.");
+	log.put_errorf("hello3.");
 	//log.putf("hh = %d", 1);
 
 	// 加密解密

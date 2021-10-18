@@ -27,9 +27,18 @@
     <ClInclude Include="fk_crypto.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="fk.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fk_define.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fk_inject.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

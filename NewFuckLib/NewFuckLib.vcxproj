@@ -139,12 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="fk.h" />
     <ClInclude Include="fk_crypto.hpp" />
+    <ClInclude Include="fk_define.h" />
     <ClInclude Include="fk_file.hpp" />
     <ClInclude Include="fk_log.hpp" />
     <ClInclude Include="fk_string.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="fk_inject.hpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
