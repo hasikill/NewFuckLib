@@ -43,7 +43,7 @@ namespace fk
 			return *this;
 		}
 
-		file& write(fk::string& text)
+		file& write(fk::string text)
 		{
 			return write(text.c_str());
 		}

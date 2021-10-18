@@ -1,5 +1,7 @@
 #pragma once
 
+#define FK_LIB
+
 #ifndef FK_LOG_UTILS_MASK
 #define FK_LOG_UTILS_MASK FK_LOGTYPE_PRE_DBGVIEW
 #endif

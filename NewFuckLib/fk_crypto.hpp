@@ -99,7 +99,7 @@ namespace fk
 		fk::string encode(const char* data, size_t size)
 		{
 			std::string res;
-			for (int i = 0; i < size; i++)
+			for (size_t i = 0; i < size; i++)
 			{
 				int low_index = 0, high_index = 0;
 				low_index = data[i] & 0xF;
@@ -117,7 +117,7 @@ namespace fk
 
 			char ch = 0;
 			char j = 0;
-			for (int i = 0; i < size; i += 2)
+			for (size_t i = 0; i < size; i += 2)
 			{
 				ch = 0;
 
@@ -164,7 +164,7 @@ namespace fk
 			int prepare = 0;
 			int temp = 0;
 			fk::string ret;
-			int tmp = 0;
+			size_t tmp = 0;
 			char changed[4];
 			int i = 0, j = 0;
 
@@ -208,7 +208,7 @@ namespace fk
 			size_t ret_len = (data_len / 4) * 3;
 			int equal_count = 0;
 			fk::string ret;
-			int tmp = 0;
+			size_t tmp = 0;
 			int temp = 0;
 			int prepare = 0;
 			int i = 0;
@@ -308,7 +308,7 @@ namespace fk
 			else
 			{
 				keylen = key.size();
-				for (int i = 0; i < key.size(); ++i)
+				for (size_t i = 0; i < key.size(); ++i)
 					K.push_back(key[i]);
 			}
 			return *this;
@@ -354,7 +354,7 @@ namespace fk
 				std::swap(S[i], S[j]);
 			}
 
-			for (int k = 0; k < len; ++k) {
+			for (size_t k = 0; k < len; ++k) {
 				i = (i + 1) % 256;
 				j = (j + S[i]) % 256;
 				std::swap(S[i], S[j]);
@@ -367,7 +367,7 @@ namespace fk
 		}
 
 		rc4& decipher(uint8_t* in, size_t len, uint8_t* out, uint8_t* ks) {
-			for (int k = 0; k < len; ++k) {
+			for (size_t k = 0; k < len; ++k) {
 				out[k] = ks[k] ^ in[k];
 			}
 			return *this;
