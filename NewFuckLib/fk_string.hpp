@@ -143,7 +143,6 @@ namespace fk
 			return result;
 		}
 
-		// 实现一些静态函数
 		template <typename T>
 		static fk::string fromnumber(T number)
 		{
