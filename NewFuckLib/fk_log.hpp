@@ -121,7 +121,7 @@ namespace fk
 					throw err;
 				}
 
-				m_log_file.write(ctx);
+				m_log_file.write(ctx).flush();
 			}
 
 			// 输出到控制台
