@@ -427,6 +427,8 @@ namespace fk
 				j = (j + 1) % c;
 			}
 
+			//printf("key S:\n%s\n", fk::string(std::string((char*)S, v)).hexstring().c_str());
+
 			delete L;
 			return *this;
 		}

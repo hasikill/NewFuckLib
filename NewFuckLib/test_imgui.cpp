@@ -4,7 +4,6 @@
 #include <imgui_impl_win32.h>
 #include <d3d9.h>
 #include <tchar.h>
-#pragma comment(lib, "d3d9.lib")
 
 static LPDIRECT3D9              g_pD3D = NULL;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = NULL;

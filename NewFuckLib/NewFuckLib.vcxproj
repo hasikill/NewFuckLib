@@ -107,9 +107,26 @@ copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
+copy "$(ProjectDir)clear_fk.bat" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_define.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
@@ -117,7 +134,23 @@ copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,9 +178,26 @@ copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
+copy "$(ProjectDir)clear_fk.bat" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_define.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
@@ -155,7 +205,23 @@ copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -179,9 +245,26 @@ copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
+copy "$(ProjectDir)clear_fk.bat" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_define.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
@@ -189,7 +272,23 @@ copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -217,9 +316,26 @@ copy "$(ProjectDir)fk_inject.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(SolutionDir)out\include" /y
 echo "include目录已输出到$(SolutionDir)out"
 
 echo "注意: 添加到系统sdk需要管理员运行Visual Studio"
+copy "$(ProjectDir)clear_fk.bat" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_define.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_crypto.hpp" "$(VCToolsInstallDir)include" /y
@@ -227,7 +343,23 @@ copy "$(ProjectDir)fk_file.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_inject.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_log.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_string.hpp" "$(VCToolsInstallDir)include" /y
-copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
+copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_demo.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_draw.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_internal.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_tables.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imgui_widgets.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_rectpack.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_textedit.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\imstb_truetype.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_dx9.h" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.cpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir)include" /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -235,6 +367,7 @@ copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     <ClInclude Include="fk_crypto.hpp" />
     <ClInclude Include="fk_define.h" />
     <ClInclude Include="fk_file.hpp" />
+    <ClInclude Include="fk_imgui_impl.hpp" />
     <ClInclude Include="fk_log.hpp" />
     <ClInclude Include="fk_string.hpp" />
     <ClInclude Include="fk_json.hpp" />
@@ -243,13 +376,6 @@ copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
     <ClCompile Include="fk_inject.hpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_imgui.cpp" />
-    <ClCompile Include="third\imgui\imgui.cpp" />
-    <ClCompile Include="third\imgui\imgui_demo.cpp" />
-    <ClCompile Include="third\imgui\imgui_draw.cpp" />
-    <ClCompile Include="third\imgui\imgui_tables.cpp" />
-    <ClCompile Include="third\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="third\imgui\impl_dx9\imgui_impl_dx9.cpp" />
-    <ClCompile Include="third\imgui\impl_dx9\imgui_impl_win32.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
