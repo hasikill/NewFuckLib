@@ -391,6 +391,7 @@ namespace fk
 			log_w = (unsigned int)log2(w);
 			modulo = (int64_t)std::pow(2, w);
 			S = new unsigned int[2 * r + 4];
+			//printf("w=%d,r=%d,log_w=%d,modulo=%lld,S_size:%d\n", w, r, log_w, modulo, 2 * r + 4);
 		}
 
 		~rc6()
@@ -400,6 +401,12 @@ namespace fk
 
 		rc6& setkey(fk::string key)
 		{
+			// key fill zero alignment
+			for (size_t i = 0; i < key.size() % 4; i++)
+			{
+				key += '\0';
+			}
+
 			b = (unsigned int)key.size();
 
 			const unsigned int w_bytes = (unsigned int)std::ceil((float)w / 8);
@@ -426,8 +433,6 @@ namespace fk
 				i = (i + 1) % (2 * r + 4);
 				j = (j + 1) % c;
 			}
-
-			//printf("key S:\n%s\n", fk::string(std::string((char*)S, v)).hexstring().c_str());
 
 			delete L;
 			return *this;
