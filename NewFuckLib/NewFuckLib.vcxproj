@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -238,6 +242,14 @@ copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y</Command>
   <ItemGroup>
     <ClCompile Include="fk_inject.hpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="test_imgui.cpp" />
+    <ClCompile Include="third\imgui\imgui.cpp" />
+    <ClCompile Include="third\imgui\imgui_demo.cpp" />
+    <ClCompile Include="third\imgui\imgui_draw.cpp" />
+    <ClCompile Include="third\imgui\imgui_tables.cpp" />
+    <ClCompile Include="third\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="third\imgui\impl_dx9\imgui_impl_dx9.cpp" />
+    <ClCompile Include="third\imgui\impl_dx9\imgui_impl_win32.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
