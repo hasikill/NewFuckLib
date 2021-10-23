@@ -368,6 +368,7 @@ copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir
     <ClInclude Include="fk_define.h" />
     <ClInclude Include="fk_file.hpp" />
     <ClInclude Include="fk_imgui_impl.hpp" />
+    <ClInclude Include="fk_ldasm.hpp" />
     <ClInclude Include="fk_log.hpp" />
     <ClInclude Include="fk_string.hpp" />
     <ClInclude Include="fk_json.hpp" />

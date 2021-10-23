@@ -42,6 +42,9 @@
     <ClInclude Include="fk_imgui_impl.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="fk_ldasm.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fk_inject.hpp">

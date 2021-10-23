@@ -7,5 +7,6 @@
 #include "fk_log.hpp"
 #include "fk_inject.hpp"
 #include "fk_json.hpp"
+#include "fk_ldasm.hpp"
 
 namespace fkjson = nlohmann;
