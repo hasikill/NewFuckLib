@@ -113,6 +113,16 @@ int main()
 	// disassemble
 	std::cout << "instr_size: " << fk::ldasm::obj().instr_size((void*)"\x64\xA1\x30\x00\x00\x00\x33\xC9\x89\x0D\xB4\x67\xE6\x77\x89\x0D\xB8\x67\xE6\x77\x88\x08\x38\x48\x02") << std::endl;
 
+	// pointer
+	struct st_tmp
+	{
+		int a;
+		char b[16];
+	};
+	st_tmp tmp = { 10, "hello"};
+	fk::pointer32 p = &tmp;
+	printf("%d, %s\n", p.dword(), p.offset(4).string().c_str());
+
 	int imgui_main();
 	imgui_main();
 

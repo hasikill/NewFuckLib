@@ -7,6 +7,9 @@ del fk_log.hpp
 del fk_string.hpp
 del fk_json.hpp
 del fk_imgui_impl.hpp
+del fk_ldasm.hpp
+del fk_hookx86.hpp
+del fk_pointer.hpp
 del imconfig.h
 del imgui.cpp
 del imgui.h
