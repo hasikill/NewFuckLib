@@ -871,6 +871,20 @@ namespace fk
             return Proc;
         }
 
+        // if address is jmp
+        bool is_jmp(void* code)
+        {
+            switch (*(uint8_t*)code)
+            {
+            case 0xe8:  // call
+            case 0xe9:  // jmp
+            case 0xeb:  // jmp short
+            case 0x74:  // je short
+            case 0x75:  // jne short
+                return true;
+            }
+            return false;
+        }
     public:
         static ldasm obj()
         {

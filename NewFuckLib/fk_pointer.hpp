@@ -20,6 +20,18 @@ namespace fk
 			return this->p;
 		}
 
+		template <typename T>
+		pointer& copy_to(T buffer, size_t size)
+		{
+			memcpy((void*)buffer, (void*)this->p, size);
+		}
+
+		template <typename T>
+		pointer& copy_from(T buffer, size_t size)
+		{
+			memcpy((void*)this->p, (void*)buffer, size);
+		}
+
 		pointer operator[](const int index)
 		{
 			return pointer<L>(*pointer<>(p + index * sizeof(p)));
@@ -64,6 +76,14 @@ namespace fk
 		fk::string string()
 		{
 			return (char*)p;
+		}
+
+		fk::string hex_string(size_t size, 
+			const char* pattern = " ")
+		{
+			return fk::string(
+				std::string((char*)this->p, 
+					size)).hexstring(pattern);
 		}
 
 		template <typename S>
