@@ -12,7 +12,7 @@ namespace fk
 		{
 		public:
 			winhook(fk::string dllname, fk::string exportfunc)
-				: fk::log_utils("winhook")
+				: fk::log_utils(__FUNCTION__)
 			{
 				m_dllname = dllname;
 				m_exportfunc = exportfunc;

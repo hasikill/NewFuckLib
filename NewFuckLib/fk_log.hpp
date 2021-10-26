@@ -163,7 +163,7 @@ namespace fk
 			return putf(str.c_str());
 		}
 
-		log& put_successf(const char* fmt, ...)
+		void put_successf(const char* fmt, ...)
 		{
 			const int fmt_buf_size = 1024 * 10;
 			char* buffer = new char[fmt_buf_size];
@@ -173,10 +173,10 @@ namespace fk
 			va_end(args);
 			put(fk::string::fmtstr("(+) %s", buffer));
 			delete buffer;
-			return *this;
+			//return *this;
 		}
 
-		log& put_errorf(const char* fmt, ...)
+		void put_errorf(const char* fmt, ...)
 		{
 			const int fmt_buf_size = 1024 * 10;
 			char* buffer = new char[fmt_buf_size];
@@ -186,7 +186,7 @@ namespace fk
 			va_end(args);
 			put(fk::string::fmtstr("(-) %s", buffer));
 			delete buffer;
-			return *this;
+			//return *this;
 		}
 
 		void close()

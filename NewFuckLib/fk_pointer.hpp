@@ -24,12 +24,14 @@ namespace fk
 		pointer& copy_to(T buffer, size_t size)
 		{
 			memcpy((void*)buffer, (void*)this->p, size);
+			return *this;
 		}
 
 		template <typename T>
 		pointer& copy_from(T buffer, size_t size)
 		{
 			memcpy((void*)this->p, (void*)buffer, size);
+			return *this;
 		}
 
 		pointer operator[](const int index)
@@ -145,4 +147,10 @@ namespace fk
 		uintptr_t m_addr;
 		size_t m_size;
 	};
+
+	template<typename dst_type, typename src_type>
+	dst_type pointer_cast(src_type src)
+	{
+		return *static_cast<dst_type*>(static_cast<void*>(&src));
+	}
 }

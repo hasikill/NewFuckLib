@@ -2,6 +2,48 @@
 #include "fk.h"
 #include "fk_imgui_impl.hpp"
 
+int
+_MessageBoxA(
+	_In_opt_ HWND hWnd,
+	_In_opt_ LPCSTR lpText,
+	_In_opt_ LPCSTR lpCaption,
+	_In_ UINT uType)
+{
+	printf("%s %s\n", lpText, lpCaption);
+	return 0;
+}
+
+VOID
+_ExitProcess(
+	_In_ UINT uExitCode
+)
+{
+	printf("%d\n", uExitCode);
+}
+
+void hook_inline_head()
+{
+	fk::hook_x86* hk = fk::hook_x86::obj();
+	hk->add_inline_head(GetProcAddress(GetModuleHandleA("user32.dll"), "MessageBoxA"), _MessageBoxA);
+	MessageBoxA(NULL, "hello", "world", NULL);
+	hk->add_inline_head(GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess"), _ExitProcess);
+}
+
+void print()
+{
+	//__try
+	//{
+	//	//fk::pointer32(0) = 0;
+	//	fk::pointer32(1.0f);
+	//	fk::pointer32(123456);
+	//	fk::pointer32((uint64_t)123456);
+	//}
+	//__except (EXCEPTION_EXECUTE_HANDLER)
+	//{
+	//	
+	//}
+}
+
 int main()
 {
 	// 字符串常用操作
@@ -38,10 +80,12 @@ int main()
 		FK_LOGTYPE_DEFAULT | fk::log::fkLogType::file,
 		"a.log", "123456", false
 	);
+
 	log.put_successf("hello.");
 	log.put_successf("hello1.");
 	log.put_successf("hello2.");
 	log.put_errorf("hello3.");
+
 	//log.putf("hh = %d", 1);
 
 	// 加密解密
@@ -122,6 +166,9 @@ int main()
 	st_tmp tmp = { 10, "hello"};
 	fk::pointer32 p = &tmp;
 	printf("%d, %s\n", p.dword(), p.offset(4).string().c_str());
+
+	// hook
+	hook_inline_head();
 
 	int imgui_main();
 	imgui_main();

@@ -14,7 +14,10 @@ namespace fk
 	private:
 		enum em_hook
 		{
-			inline_hook
+			inline_hook,
+			inline_hook_obj,
+			vtable_hook,
+
 		};
 
 		struct st_hook
@@ -43,7 +46,7 @@ namespace fk
 #include <poppack.h>
 
 	private:
-		hook_x86() : fk::log_utils("hook_x86")
+		hook_x86() : fk::log_utils(__FUNCTION__)
 		{
 			new_page();
 		}
@@ -51,23 +54,53 @@ namespace fk
 	public: // release memeory
 		~hook_x86()
 		{
-			m_mtx_middle.lock();
-			for (auto p : m_middle_pools)
-			{
-				if (p != nullptr)
-					delete[] p;
-			}
-			m_middle_pools.clear();
-			m_mtx_middle.unlock();
+			release();
 			delete this;
 		}
 
-		void add_inline_head(uintptr_t func_src, 
-			uintptr_t func_handler, 
+		void release()
+		{
+			if (m_is_release == false)
+			{
+				m_is_release = true;
+
+				// close all hooks
+				clear();
+
+				// release pools
+				m_mtx_middle.lock();
+				for (auto p : m_middle_pools)
+				{
+					if (p != nullptr)
+						delete[] p;
+				}
+				m_middle_pools.clear();
+				m_mtx_middle.unlock();
+			}
+		}
+
+		template <typename S, typename D>
+		hook_x86* add_inline_head_obj(
+			S _func_src,
+			D _func_handler,
 			size_t max_params = 10)
 		{
+			return add_inline_head(_func_src, _func_handler, max_params, true);
+		}
+
+		template <typename S, typename D>
+		hook_x86* add_inline_head(
+			S _func_src,
+			D _func_handler, 
+			size_t max_params = 10,
+			bool is_member = false)
+		{
+			uintptr_t func_src = (uintptr_t)_func_src;
+			uintptr_t func_handler = (uintptr_t)_func_handler;
+
 			st_hook info;
-			info.type = inline_hook;
+
+			info.type = is_member ? inline_hook_obj : inline_hook;
 
 			// check func_src
 			if (IsBadReadPtr((void*)func_src, 
@@ -75,7 +108,6 @@ namespace fk
 			{
 				put_errorf("invalid address, func_src = %p\n", func_src);
 				throw "invalid address";
-				return;
 			}
 
 			// calculate the length of the affected instruction by the JMP instruction
@@ -90,29 +122,64 @@ namespace fk
 			info.inline_head.func_handler = func_handler;
 			info.inline_head.max_params = max_params;
 
+			uintptr_t p_shellcode = 0;
+
 			// generate trampoline shellcode
-			uint8_t shellcode[] = {
-				0x60,
-				0x9C,
-				0x8D, 0x74, 0x24, 0x24,
-				0x83, 0xEC, (uint8_t)(max_params * sizeof(intptr_t)),
-				0x89, 0xE7,
-				0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
-				0xF3, 0xA5,
-				0x83, 0xC4, 0x04,
-				0xE8, 0x00, 0x00, 0x00, 0x00,
-				0x89, 0xE6,
-				0x8D, 0x7C, 0x24, 0x48,
-				0xB9, 0x08, 0x00, 0x00, 0x00,
-				0xF3, 0xA5,
-				0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t) - 4),
-				0x9D,
-				0x61
-			};
-			uintptr_t p_shellcode = fix_inline_head_shellcode(
-				shellcode, 
-				sizeof(shellcode),
-				info);
+			if (is_member == false)
+			{
+				uint8_t shellcode[] = {
+					0x60,
+					0x9C,
+					0x8D, 0x74, 0x24, 0x24,
+					0x83, 0xEC, (uint8_t)(max_params * sizeof(intptr_t)),
+					0x89, 0xE7,
+					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xF3, 0xA5,
+					0x83, 0xC4, 0x04,
+					0xE8, 0x00, 0x00, 0x00, 0x00,
+					0x89, 0xE6,
+					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x24),
+					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xF3, 0xA5,
+					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t) - 4),
+					0x9D,
+					0x61
+				};
+
+				p_shellcode = fix_inline_head_shellcode(
+					shellcode,
+					sizeof(shellcode),
+					info);
+			}
+			else
+			{
+				// member function deliver 'this' pointer use ecx register
+				uint8_t shellcode[] = {
+					0x60,
+					0x9C,
+					0x8D, 0x74, 0x24, 0x24,
+					0x83, 0xEC, (uint8_t)(max_params * sizeof(intptr_t)),
+					0x89, 0xE7,
+					0x51,
+					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xF3, 0xA5,
+					0x59,
+					0x89, 0x0C, 0x24,
+					0xE8, 0x00, 0x00, 0x00, 0x00,
+					0x89, 0xE6,
+					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x28),
+					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xF3, 0xA5,
+					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t)),
+					0x9D,
+					0x61
+				};
+
+				p_shellcode = fix_inline_head_shellcode(
+					shellcode,
+					sizeof(shellcode),
+					info);
+			}
 
 			// add to maps
 			m_mtx_hooks.lock();
@@ -120,12 +187,65 @@ namespace fk
 			m_mtx_hooks.unlock();
 
 			// modify the source and jmp to destination
-			st_trampoline binaray = calc_trampoline(func_src, p_shellcode);
-			fk::auto_mem_protect auto_protect(func_src, sizeof(binaray));
-			fk::pointer32(func_src).copy_from(&binaray, sizeof(binaray));
+			st_trampoline trampoline = calc_trampoline(func_src, p_shellcode);
+			fk::auto_mem_protect auto_protect(func_src, sizeof(trampoline));
+			fk::pointer32(func_src).copy_from(&trampoline, sizeof(trampoline));
+			return this;
+		}
+
+		template <typename S>
+		hook_x86* remove_hook(S _func_src)
+		{
+			uintptr_t func_src = (uintptr_t)_func_src;
+			if (m_hooks.count(func_src) < 0)
+			{
+				put_errorf("remove_hook invalid _func_src, func_src = %p\n", func_src);
+				throw "remove_hook invalid _func_src";
+			}
+
+			// get item
+			st_hook& info = m_hooks[func_src];
+
+			// restore
+			restore_hook(info);
+
+			// remove item from maps
+			m_mtx_hooks.lock();
+			m_hooks.erase(func_src);
+			m_mtx_hooks.unlock();
+			return this;
+		}
+
+		void clear()
+		{
+			for (auto item : m_hooks)
+			{
+				restore_hook(item.second);
+			}
+
+			m_mtx_hooks.lock();
+			m_hooks.clear();
+			m_mtx_hooks.unlock();
 		}
 
 	private:
+		void restore_hook(st_hook& info)
+		{
+			if (info.type == inline_hook || 
+				info.type == inline_hook_obj)
+			{
+				// restore source function
+				fk::auto_mem_protect auto_p(
+					info.inline_head.func_src,
+					info.inline_head.affected_instrs_size);
+				fk::pointer32(
+					info.inline_head.func_src).copy_from(
+					info.inline_head.affected_instrs,
+					info.inline_head.affected_instrs_size
+				);
+			}
+		}
+
 		uintptr_t fix_inline_head_shellcode(
 			uint8_t* shellcode, 
 			size_t size, 
@@ -153,9 +273,18 @@ namespace fk
 			m_use_offset = m_use_offset + size;
 
 			// fix call handler
-			p.offset(22) = 
-				info.inline_head.func_handler - 
-				p.offset(22).v() - 5;
+			if (info.type == inline_hook)
+			{
+				p.offset(22) =
+					calc_jmp5_op(p.offset(21).v(),
+						info.inline_head.func_handler);
+			}
+			else if (info.type == inline_hook_obj)
+			{
+				p.offset(24) =
+					calc_jmp5_op(p.offset(23).v(),
+						info.inline_head.func_handler);
+			}
 
 			// copy affected instrs to middle
 			pointer32 p_affected = p.offset(size);
@@ -167,28 +296,32 @@ namespace fk
 
 			// fix jmp offset
 			size_t instr_offset = 0;
-			while (true)
+			while (instr_offset < info.inline_head.affected_instrs_size)
 			{
 				pointer32 p_it = p_affected + instr_offset;
 				size_t instr_size = calc_instr_size(p_it);
 				bool is_jmp = is_jmp_instr(p_it);
-				if (instr_size > 2)
-				{	// 5 bytes jmp, fix jmp destination
-					uintptr_t dest = calc_jmp5_dest(
-						info.inline_head.func_src + 
-						instr_offset, 
-						p_it.offset(1).dword());
-
-					// fix op
-					p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
-				}
-				else
+				if (is_jmp) // if is jmp and fix
 				{
-					m_mtx_middle.unlock();
-					put_errorf("invalid jmp short. %s\n",
-						p_it.hex_string(instr_size).c_str());
-					throw "not supported at the moment.";
+					if (instr_size > 2)
+					{	// 5 bytes jmp, fix jmp destination
+						uintptr_t dest = calc_jmp5_dest(
+							info.inline_head.func_src +
+							instr_offset,
+							p_it.offset(1).dword());
+
+						// fix op
+						p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
+					}
+					else
+					{
+						m_mtx_middle.unlock();
+						put_errorf("invalid jmp short. %s\n",
+							p_it.hex_string(instr_size).c_str());
+						throw "not supported at the moment.";
+					}
 				}
+
 				instr_offset = instr_offset + instr_size;
 			}
 
@@ -259,7 +392,7 @@ namespace fk
 				size_t instr_size = fk::ldasm::obj().instr_size((void*)addr);
 				addr = addr + instr_size;
 				ret = ret + instr_size;
-				if (ret > length)
+				if (ret >= length)
 				{
 					return ret;
 				}
@@ -278,13 +411,8 @@ namespace fk
 	public: // get instance
 		static hook_x86* obj()
 		{
-			hook_x86* ret = nullptr;
-			mtx_instance.lock();
-			if (instance == nullptr)
-				instance = new hook_x86();
-			ret = instance;
-			mtx_instance.unlock();
-			return ret;
+			static hook_x86* instance = new hook_x86();
+			return instance;
 		}
 
 	private:
@@ -299,9 +427,7 @@ namespace fk
 
 		uint32_t m_old_protect;
 
-		// singleton static instance
-		static hook_x86* instance;
-		static std::mutex mtx_instance;
+		bool m_is_release = false;
 	};
 #endif
 }
