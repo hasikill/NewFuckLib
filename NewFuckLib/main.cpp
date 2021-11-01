@@ -29,6 +29,51 @@ void hook_inline_head()
 	hk->add_inline_head(GetProcAddress(GetModuleHandleA("kernel32.dll"), "ExitProcess"), _ExitProcess);
 }
 
+class test
+{
+public:
+	test()
+	{
+		printf("test()\n");
+		strcpy_s(name, "strlen");
+	}
+
+	virtual void fun1(int a)
+	{
+		val = 1;
+		printf("virtual void fun1(): %d\n", a);
+	}
+
+	virtual void fun2()
+	{
+		val = 2;
+		printf("virtual void fun2()\n");
+	}
+
+	virtual ~test()
+	{
+		printf("~test()\n");
+	}
+private:
+	int val = 20;
+	char name[16];
+};
+
+void hook(uintptr_t src, void* obj, int a)
+{
+	printf("%p %p %p\n", src, obj, a);
+}
+
+void hook_vtable()
+{
+	test t;
+
+	fk::hook_x86* hk = fk::hook_x86::obj();
+	hk->add_vtable_hook(&t, 0, hook, 1);
+
+	(&t)->fun1(0x12345678);
+}
+
 void print()
 {
 	//__try
@@ -169,6 +214,9 @@ int main()
 
 	// hook
 	hook_inline_head();
+
+	// hook vtable
+	hook_vtable();
 
 	int imgui_main();
 	imgui_main();

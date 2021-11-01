@@ -34,6 +34,15 @@ namespace fk
 					size_t affected_instrs_size;
 					size_t max_params;
 				} inline_head;
+
+				struct
+				{
+					uintptr_t src_obj;
+					uintptr_t src_index;
+					uintptr_t func_src;
+					uintptr_t func_handler;
+					size_t max_params;
+				} vtable;
 			};
 		};
 
@@ -146,7 +155,7 @@ namespace fk
 					0x61
 				};
 
-				p_shellcode = fix_inline_head_shellcode(
+				p_shellcode = fix_shellcode(
 					shellcode,
 					sizeof(shellcode),
 					info);
@@ -175,7 +184,7 @@ namespace fk
 					0x61
 				};
 
-				p_shellcode = fix_inline_head_shellcode(
+				p_shellcode = fix_shellcode(
 					shellcode,
 					sizeof(shellcode),
 					info);
@@ -193,10 +202,110 @@ namespace fk
 			return this;
 		}
 
+		template <typename O, typename H>
+		hook_x86* add_vtable_hook(
+			O obj, 
+			uint32_t index, 
+			H handler,
+			uint32_t param_count = 0,
+			uint32_t max_params = 10)
+		{
+			pointer32 p_obj = obj;
+
+			st_hook info;
+			info.type = vtable_hook;
+
+			// get vtable
+			auto vtable = p_obj.ptr();
+
+			// get item
+			auto item = vtable[index];
+
+			// record
+			info.vtable.src_obj = p_obj.v();
+			info.vtable.src_index = index;
+			info.vtable.func_src = item.v();
+			info.vtable.func_handler = reinterpret_cast<uintptr_t>(handler);
+			info.vtable.max_params = max_params;
+			
+			// member function deliver 'this' pointer use ecx register
+			uint8_t shellcode[] = {
+				0x55, 
+				0x89, 0xE5, 
+				0x51, 
+				0x57,
+				0x56,
+				0x8D, 0x75, 0x08, 
+				0x83, 0xEC, (uint8_t)(max_params * sizeof(intptr_t)),
+				0x89, 0xE7, 
+				0x51, 
+				0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+				0xF3, 0xA5, 
+				0x59, 
+				0x51, 
+				0x68, 0x78, 0x56, 0x34, 0x12, 
+				0xE8, 0x00, 0x00, 0x00, 0x00, 
+				0x83, 0xC4, 0x08, 
+				0x89, 0xE6, 
+				0x8D, 0x7D, 0x08, 
+				0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+				0xF3, 0xA5, 
+				0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t)),
+				0x5E, 
+				0x5F,
+				0x59,
+				0x89, 0xEC, 
+				0x5D, 
+				0xC2, (uint8_t) param_count * sizeof(uintptr_t), 0x00
+			};
+
+			uintptr_t p_shellcode = fix_shellcode(
+				shellcode,
+				sizeof(shellcode),
+				info);
+
+			// add to maps
+			m_mtx_hooks.lock();
+			m_hooks.insert(std::pair<uintptr_t, st_hook>(vtable.offset(index * sizeof(uintptr_t)).v(), info));
+			m_mtx_hooks.unlock();
+
+			// modify the source item
+			fk::pointer32 p_item = vtable.offset(index * sizeof(uintptr_t));
+			fk::auto_mem_protect prot_item(p_item.v(), 4);
+
+			p_item.write((uintptr_t)p_shellcode);
+			return this;
+		}
+		
 		template <typename S>
 		hook_x86* remove_hook(S _func_src)
 		{
 			uintptr_t func_src = (uintptr_t)_func_src;
+			if (m_hooks.count(func_src) < 0)
+			{
+				put_errorf("remove_hook invalid _func_src, func_src = %p\n", func_src);
+				throw "remove_hook invalid _func_src";
+			}
+
+			// get item
+			st_hook& info = m_hooks[func_src];
+
+			// restore
+			restore_hook(info);
+
+			// remove item from maps
+			m_mtx_hooks.lock();
+			m_hooks.erase(func_src);
+			m_mtx_hooks.unlock();
+			return this;
+		}
+
+		template <typename S>
+		hook_x86* remove_hook(S obj, uint32_t index)
+		{
+			fk::pointer32 p_obj(obj);
+			uintptr_t func_src = p_obj.ptr().
+				offset(index * sizeof(uintptr_t)).v();
 			if (m_hooks.count(func_src) < 0)
 			{
 				put_errorf("remove_hook invalid _func_src, func_src = %p\n", func_src);
@@ -244,9 +353,18 @@ namespace fk
 					info.inline_head.affected_instrs_size
 				);
 			}
+			else if (info.type == vtable_hook)
+			{
+				fk::pointer32 p_obj = info.vtable.src_obj;
+				fk::pointer32 p_item = p_obj.ptr().offset(info.vtable.src_index).v();
+				fk::auto_mem_protect auto_p(
+					p_item.v(),
+					4);
+				p_item.write(info.vtable.func_src);
+			}
 		}
 
-		uintptr_t fix_inline_head_shellcode(
+		uintptr_t fix_shellcode(
 			uint8_t* shellcode, 
 			size_t size, 
 			st_hook& info)
@@ -254,8 +372,8 @@ namespace fk
 			// Check remaining space
 			if (m_use_offset + 
 				size + 
-				info.inline_head.affected_instrs_size +
-				sizeof(st_trampoline) + 10 > 
+				(info.type == vtable_hook ? 0 : info.inline_head.affected_instrs_size + sizeof(st_trampoline)) +
+				10 > 
 				USN_PAGE_SIZE)
 			{
 				// allocate a new page
@@ -285,56 +403,66 @@ namespace fk
 					calc_jmp5_op(p.offset(23).v(),
 						info.inline_head.func_handler);
 			}
-
-			// copy affected instrs to middle
-			pointer32 p_affected = p.offset(size);
-			p_affected.copy_from(
-				info.inline_head.affected_instrs, 
-				info.inline_head.affected_instrs_size);
-			m_use_offset = m_use_offset +
-				info.inline_head.affected_instrs_size;
-
-			// fix jmp offset
-			size_t instr_offset = 0;
-			while (instr_offset < info.inline_head.affected_instrs_size)
+			else if (info.type == vtable_hook)
 			{
-				pointer32 p_it = p_affected + instr_offset;
-				size_t instr_size = calc_instr_size(p_it);
-				bool is_jmp = is_jmp_instr(p_it);
-				if (is_jmp) // if is jmp and fix
-				{
-					if (instr_size > 2)
-					{	// 5 bytes jmp, fix jmp destination
-						uintptr_t dest = calc_jmp5_dest(
-							info.inline_head.func_src +
-							instr_offset,
-							p_it.offset(1).dword());
-
-						// fix op
-						p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
-					}
-					else
-					{
-						m_mtx_middle.unlock();
-						put_errorf("invalid jmp short. %s\n",
-							p_it.hex_string(instr_size).c_str());
-						throw "not supported at the moment.";
-					}
-				}
-
-				instr_offset = instr_offset + instr_size;
+				p.offset(25) = info.vtable.func_src;
+				p.offset(30) =
+					calc_jmp5_op(p.offset(29).v(),
+						info.vtable.func_handler);
 			}
 
-			// add jmp to raw func
-			pointer32 p_jmp = p_affected.offset(
-				info.inline_head.affected_instrs_size);
-			st_trampoline trampoline = calc_trampoline(
-				p_jmp.v(), 
-				info.inline_head.func_src + 
-				info.inline_head.affected_instrs_size);
-			p_jmp.copy_from(&trampoline, sizeof(trampoline));
-			m_use_offset = m_use_offset +
-				sizeof(trampoline);
+			if (info.type != vtable_hook)
+			{
+				// copy affected instrs to middle
+				pointer32 p_affected = p.offset(size);
+				p_affected.copy_from(
+					info.inline_head.affected_instrs,
+					info.inline_head.affected_instrs_size);
+				m_use_offset = m_use_offset +
+					info.inline_head.affected_instrs_size;
+
+				// fix jmp offset
+				size_t instr_offset = 0;
+				while (instr_offset < info.inline_head.affected_instrs_size)
+				{
+					pointer32 p_it = p_affected + instr_offset;
+					size_t instr_size = calc_instr_size(p_it);
+					bool is_jmp = is_jmp_instr(p_it);
+					if (is_jmp) // if is jmp and fix
+					{
+						if (instr_size > 2)
+						{	// 5 bytes jmp, fix jmp destination
+							uintptr_t dest = calc_jmp5_dest(
+								info.inline_head.func_src +
+								instr_offset,
+								p_it.offset(1).dword());
+
+							// fix op
+							p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
+						}
+						else
+						{
+							m_mtx_middle.unlock();
+							put_errorf("invalid jmp short. %s\n",
+								p_it.hex_string(instr_size).c_str());
+							throw "not supported at the moment.";
+						}
+					}
+
+					instr_offset = instr_offset + instr_size;
+				}
+
+				// add jmp to raw func
+				pointer32 p_jmp = p_affected.offset(
+					info.inline_head.affected_instrs_size);
+				st_trampoline trampoline = calc_trampoline(
+					p_jmp.v(),
+					info.inline_head.func_src +
+					info.inline_head.affected_instrs_size);
+				p_jmp.copy_from(&trampoline, sizeof(trampoline));
+				m_use_offset = m_use_offset +
+					sizeof(trampoline);
+			}
 
 			m_use_offset = m_use_offset + 10;
 			m_mtx_middle.unlock();
@@ -429,5 +557,12 @@ namespace fk
 
 		bool m_is_release = false;
 	};
+
+	template <typename T, typename A, typename B>
+	inline T call_member(A obj, B func)
+	{
+		__asm mov ecx, obj;
+		return (T)func;
+	}
 #endif
 }
