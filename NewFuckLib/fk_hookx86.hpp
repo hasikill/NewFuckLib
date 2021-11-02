@@ -92,15 +92,17 @@ namespace fk
 		hook_x86* add_inline_head_obj(
 			S _func_src,
 			D _func_handler,
+			bool isdebug = false,
 			size_t max_params = 10)
 		{
-			return add_inline_head(_func_src, _func_handler, max_params, true);
+			return add_inline_head(_func_src, _func_handler, isdebug, max_params, true);
 		}
 
 		template <typename S, typename D>
 		hook_x86* add_inline_head(
 			S _func_src,
 			D _func_handler, 
+			bool isdebug = false,
 			size_t max_params = 10,
 			bool is_member = false)
 		{
@@ -137,6 +139,7 @@ namespace fk
 			if (is_member == false)
 			{
 				uint8_t shellcode[] = {
+					isdebug ? 0xCC : 0x90,
 					0x60,
 					0x9C,
 					0x8D, 0x74, 0x24, 0x24,
@@ -164,6 +167,7 @@ namespace fk
 			{
 				// member function deliver 'this' pointer use ecx register
 				uint8_t shellcode[] = {
+					isdebug ? 0xCC : 0x90,
 					0x60,
 					0x9C,
 					0x8D, 0x74, 0x24, 0x24,
@@ -175,9 +179,9 @@ namespace fk
 					0x59,
 					0x89, 0x0C, 0x24,
 					0xE8, 0x00, 0x00, 0x00, 0x00,
-					0x89, 0xE6,
+					0x8D, 0x74, 0X24, 0X04,
 					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x28),
-					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xB9, (uint8_t)max_params - 1, 0x00, 0x00, 0x00,
 					0xF3, 0xA5,
 					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t)),
 					0x9D,
@@ -212,11 +216,27 @@ namespace fk
 		{
 			pointer32 p_obj = obj;
 
+			// check func_src
+			if (IsBadReadPtr((void*)p_obj.v(),
+				4))
+			{
+				put_errorf("invalid obj, obj = %p\n", p_obj.v());
+				throw "invalid obj";
+			}
+
 			st_hook info;
 			info.type = vtable_hook;
 
 			// get vtable
 			auto vtable = p_obj.ptr();
+
+			// check func_src
+			if (IsBadReadPtr((void*)vtable.v(),
+				4))
+			{
+				put_errorf("invalid vtable, vtable = %p\n", vtable.v());
+				throw "invalid vtable";
+			}
 
 			// get item
 			auto item = vtable[index];
@@ -374,7 +394,7 @@ namespace fk
 				size + 
 				(info.type == vtable_hook ? 0 : info.inline_head.affected_instrs_size + sizeof(st_trampoline)) +
 				10 > 
-				USN_PAGE_SIZE)
+				0x1000)
 			{
 				// allocate a new page
 				new_page();
@@ -393,14 +413,14 @@ namespace fk
 			// fix call handler
 			if (info.type == inline_hook)
 			{
-				p.offset(22) =
-					calc_jmp5_op(p.offset(21).v(),
+				p.offset(23) =
+					calc_jmp5_op(p.offset(22).v(),
 						info.inline_head.func_handler);
 			}
 			else if (info.type == inline_hook_obj)
 			{
-				p.offset(24) =
-					calc_jmp5_op(p.offset(23).v(),
+				p.offset(25) =
+					calc_jmp5_op(p.offset(24).v(),
 						info.inline_head.func_handler);
 			}
 			else if (info.type == vtable_hook)
@@ -473,16 +493,16 @@ namespace fk
 		void new_page()
 		{
 			m_mtx_middle.lock();
-			m_use_space = new char[USN_PAGE_SIZE];
+			m_use_space = new char[0x1000];
 			if (m_use_space == nullptr)
 			{
-				put_errorf("not enough memory.");
 				m_mtx_middle.unlock();
+				put_errorf("not enough memory.");
 				throw "not enough memory.";
 			}
-			memset(m_use_space, 0xcc, USN_PAGE_SIZE);
+			memset(m_use_space, 0xcc, 0x1000);
 			m_use_offset = 0;
-			VirtualProtect(m_use_space, USN_PAGE_SIZE, PAGE_EXECUTE_READWRITE, (PDWORD)&m_old_protect);
+			VirtualProtect(m_use_space, 0x1000, PAGE_EXECUTE_READWRITE, (PDWORD)&m_old_protect);
 
 			m_middle_pools.push_back(m_use_space);
 			m_mtx_middle.unlock();

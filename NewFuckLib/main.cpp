@@ -38,10 +38,11 @@ public:
 		strcpy_s(name, "strlen");
 	}
 
-	virtual void fun1(int a)
+	virtual int fun1(int a)
 	{
 		val = 1;
 		printf("virtual void fun1(): %d\n", a);
+		return a + val;
 	}
 
 	virtual void fun2()
@@ -57,11 +58,15 @@ public:
 private:
 	int val = 20;
 	char name[16];
+	friend void _fastcall hook(void* o);
 };
 
-void hook(uintptr_t src, void* obj, int a)
+int hook(uintptr_t src, uintptr_t obj, int a)
 {
 	printf("%p %p %p\n", src, obj, a);
+	printf("name = %s\n", fk::pointer32(obj).offset(8).v());
+	a = 20;
+	return fk::call_member<int(__stdcall*)(int)>(obj, src)(a);
 }
 
 void hook_vtable()
@@ -71,7 +76,12 @@ void hook_vtable()
 	fk::hook_x86* hk = fk::hook_x86::obj();
 	hk->add_vtable_hook(&t, 0, hook, 1);
 
-	(&t)->fun1(0x12345678);
+	//__debugbreak();
+	int a = (&t)->fun1(0x12345678);
+	printf("fun1 = %p\n", a);
+
+	hk->remove_hook(&t, 0);
+	printf("2 fun1 = %p\n", (&t)->fun1(0x12345678));
 }
 
 void print()

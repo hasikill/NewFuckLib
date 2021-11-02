@@ -96,6 +96,7 @@ namespace fk
 			{
 				if (m_log_passwd.empty())
 				{
+					m_log_mtx.unlock();
 					const char* err = "'encrypt' mask is used but no password is specified.\n";
 					OutputDebugStringA(err);
 					throw err;
@@ -116,6 +117,7 @@ namespace fk
 			{
 				if (m_log_file.m_fp == nullptr)
 				{
+					m_log_mtx.unlock();
 					const char* err = "'file' mask is used but no file path is specified.\n";
 					OutputDebugStringA(err);
 					throw err;
