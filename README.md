@@ -11,6 +11,7 @@ copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_ldasm.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_hookx86.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_pointer.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_window.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
@@ -42,6 +43,7 @@ copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_ldasm.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_hookx86.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_pointer.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_window.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y

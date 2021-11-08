@@ -4,6 +4,7 @@
 #include <sstream>
 #include <regex>
 #include <stdarg.h>
+#include <Windows.h>
 
 namespace fk
 {
@@ -143,6 +144,28 @@ namespace fk
 			return result;
 		}
 
+		std::wstring to_unicode()
+		{
+			int len = length();
+			int unicode_len = ::MultiByteToWideChar(CP_ACP,
+				0,
+				c_str(),
+				-1,
+				NULL,
+				0);
+			wchar_t* unicode_buf = new wchar_t[unicode_len + 1] { 0 };
+			::MultiByteToWideChar(CP_ACP,
+				0,
+				c_str(),
+				-1,
+				(LPWSTR)unicode_buf,
+				unicode_len);
+			std::wstring ret = unicode_buf;
+			delete [] unicode_buf;
+			return ret;
+		}
+
+	public:
 		template <typename T>
 		static fk::string fromnumber(T number)
 		{

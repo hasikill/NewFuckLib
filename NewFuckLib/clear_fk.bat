@@ -10,6 +10,7 @@ del fk_imgui_impl.hpp
 del fk_ldasm.hpp
 del fk_hookx86.hpp
 del fk_pointer.hpp
+del fk_window.hpp
 del imconfig.h
 del imgui.cpp
 del imgui.h

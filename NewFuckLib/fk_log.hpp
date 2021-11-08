@@ -123,6 +123,12 @@ namespace fk
 					throw err;
 				}
 
+				// the file may have been deleted
+				if (m_log_file.exits() == false)
+				{
+					m_log_file.reopen();
+				}
+
 				m_log_file.write(ctx).flush();
 			}
 

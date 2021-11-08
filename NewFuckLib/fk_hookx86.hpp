@@ -8,6 +8,21 @@
 namespace fk
 {
 #ifndef _WIN64
+
+	struct st_hook_context
+	{
+		uintptr_t edi;
+		uintptr_t esi;
+		uintptr_t ebp;
+		uintptr_t esp;
+		uintptr_t ebx;
+		uintptr_t edx;
+		uintptr_t ecx;
+		uintptr_t eax;
+		uintptr_t eflag;
+		uintptr_t eip;
+	};
+
 	// singleton
 	class hook_x86 : protected fk::log_utils
 	{
@@ -15,9 +30,10 @@ namespace fk
 		enum em_hook
 		{
 			inline_hook,
+			inline_raw,
+			inline_general,
 			inline_hook_obj,
 			vtable_hook,
-
 		};
 
 		struct st_hook
@@ -34,6 +50,22 @@ namespace fk
 					size_t affected_instrs_size;
 					size_t max_params;
 				} inline_head;
+
+				struct
+				{
+					uintptr_t func_src;
+					uintptr_t func_handler;
+					uintptr_t func_raw;
+					size_t affected_instrs_size;
+				} inline_raw;
+
+				struct
+				{
+					uintptr_t func_src;
+					uintptr_t func_handler;
+					char affected_instrs[32];
+					size_t affected_instrs_size;
+				} inline_general;
 
 				struct
 				{
@@ -139,7 +171,7 @@ namespace fk
 			if (is_member == false)
 			{
 				uint8_t shellcode[] = {
-					isdebug ? 0xCC : 0x90,
+					(uint8_t)(isdebug ? 0xCC : 0x90),
 					0x60,
 					0x9C,
 					0x8D, 0x74, 0x24, 0x24,
@@ -167,7 +199,7 @@ namespace fk
 			{
 				// member function deliver 'this' pointer use ecx register
 				uint8_t shellcode[] = {
-					isdebug ? 0xCC : 0x90,
+					(uint8_t)(isdebug ? 0xCC : 0x90),
 					0x60,
 					0x9C,
 					0x8D, 0x74, 0x24, 0x24,
@@ -181,7 +213,7 @@ namespace fk
 					0xE8, 0x00, 0x00, 0x00, 0x00,
 					0x8D, 0x74, 0X24, 0X04,
 					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x28),
-					0xB9, (uint8_t)max_params - 1, 0x00, 0x00, 0x00,
+					0xB9, (uint8_t)(max_params - 1), 0x00, 0x00, 0x00,
 					0xF3, 0xA5,
 					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t)),
 					0x9D,
@@ -205,6 +237,140 @@ namespace fk
 			fk::pointer32(func_src).copy_from(&trampoline, sizeof(trampoline));
 			return this;
 		}
+
+		template <typename S, typename D>
+		hook_x86* add_inline_raw(
+			S _func_src,
+			D _func_handler,
+			bool isdebug = false)
+		{
+			uintptr_t func_src = (uintptr_t)_func_src;
+			uintptr_t func_handler = (uintptr_t)_func_handler;
+
+			// check func_src
+			if (IsBadReadPtr((void*)func_src,
+				10))
+			{
+				put_errorf("invalid address, func_src = %p\n", func_src);
+				throw "invalid address";
+			}
+
+			st_hook info;
+			info.type = inline_raw;
+			info.inline_raw.func_src = func_src;
+			info.inline_raw.func_handler = func_handler;
+
+			// calculate the length of the affected instruction by the JMP instruction
+			size_t affected_size =
+				calc_affected(func_src, sizeof(st_trampoline));
+			info.inline_raw.affected_instrs_size = affected_size;
+
+			// Check remaining space
+			if (m_use_offset +
+				1 +
+				affected_size +
+				sizeof(st_trampoline) +
+				10 >
+				0x1000)
+			{
+				// allocate a new page
+				new_page();
+			}
+
+			m_mtx_middle.lock();
+
+			// copy to middle space
+			pointer32 p =
+				pointer32(m_use_space) +
+				m_use_offset;
+
+			// is debug
+			p.write((uint8_t)(isdebug ? 0xCC : 0x90));
+			m_use_offset += 1;
+
+			// copy affected instrs to middle
+			pointer32 p_affected = p.offset(1);
+			p_affected.copy_from(
+				func_src,
+				affected_size);
+			m_use_offset = m_use_offset +
+				affected_size;
+			info.inline_raw.func_raw = p.v();
+
+			// fix jmp offset for affected
+			size_t instr_offset = 0;
+			while (instr_offset < affected_size)
+			{
+				pointer32 p_it = p_affected + instr_offset;
+				size_t instr_size = calc_instr_size(p_it);
+				bool is_jmp = is_jmp_instr(p_it);
+				if (is_jmp) // if is jmp and fix
+				{
+					if (instr_size > 2)
+					{	// 5 bytes jmp, fix jmp destination
+						uintptr_t dest = calc_jmp5_dest(
+							info.inline_raw.func_src +
+							instr_offset,
+							p_it.offset(1).dword());
+
+						// fix op
+						p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
+					}
+					else
+					{
+						m_mtx_middle.unlock();
+						put_errorf("invalid jmp short. %s\n",
+							p_it.hex_string(instr_size).c_str());
+						throw "not supported at the moment.";
+					}
+				}
+
+				instr_offset = instr_offset + instr_size;
+			}
+
+			// add jmp to raw func
+			pointer32 p_jmp = p_affected.offset(
+				affected_size);
+			st_trampoline trampoline_raw = calc_trampoline(
+				p_jmp.v(),
+				func_src +
+				affected_size);
+			p_jmp.copy_from(&trampoline_raw, sizeof(trampoline_raw));
+			m_use_offset = m_use_offset +
+				sizeof(trampoline_raw);
+
+			m_mtx_middle.unlock();
+
+			// add to maps
+			m_mtx_hooks.lock();
+			m_hooks.insert(std::pair<uintptr_t, st_hook>(func_src, info));
+			m_mtx_hooks.unlock();
+
+			// modify the source and jmp to destination
+			st_trampoline trampoline = calc_trampoline(func_src, func_handler);
+			fk::auto_mem_protect auto_protect(func_src, sizeof(trampoline));
+			fk::pointer32(func_src).copy_from(&trampoline, sizeof(trampoline));
+			return this;
+		}
+
+		template <typename S>
+		S get_raw_func(S src_handler)
+		{
+			for (auto item : m_hooks)
+			{
+				auto& info = item.second;
+				if (info.type == inline_raw)
+				{
+					if (info.inline_raw.func_handler == 
+						(uintptr_t)src_handler)
+					{
+						return (S)info.inline_raw.func_raw;
+					}
+				}
+			}
+			return (S)0;
+		}
+
 
 		template <typename O, typename H>
 		hook_x86* add_vtable_hook(
@@ -298,6 +464,135 @@ namespace fk
 		}
 		
 		template <typename S>
+		hook_x86* add_inline_general(
+			S _func_src,
+			void (_cdecl* _func_handler)(st_hook_context* ),
+			bool isdebug = false)
+		{
+			uintptr_t func_src = (uintptr_t)_func_src;
+			uintptr_t func_handler = (uintptr_t)_func_handler;
+
+			// check func_src
+			if (IsBadReadPtr((void*)func_src,
+				10))
+			{
+				put_errorf("invalid address, func_src = %p\n", func_src);
+				throw "invalid address";
+			}
+
+			st_hook info;
+			info.type = inline_general;
+			info.inline_general.func_src = func_src;
+
+			uint8_t shellcode[] =
+			{
+				(uint8_t)(isdebug ? 0xCC : 0x90),
+				0x68, 0x78, 0x56, 0x34, 0x12, 
+				0x9C, 
+				0x60, 
+				0x54, 
+				0xE8, 0xC8, 0x3A, 0x41, 0x9B, 
+				0x83, 0xC4, 0x04, 
+				0x61, 
+				0x9D, 
+				0xC3
+			};
+
+			size_t shellcode_size = sizeof(shellcode);
+			
+			// calculate the length of the affected instruction by the JMP instruction
+			size_t affected_size =
+				calc_affected(func_src, sizeof(st_trampoline));
+			pointer32(func_src).copy_to(
+				info.inline_general.affected_instrs, affected_size);
+			info.inline_general.affected_instrs_size =
+				affected_size;
+			
+			// Check remaining space
+			if (m_use_offset +
+				affected_size +
+				shellcode_size +
+				10 >
+				0x1000)
+			{
+				// allocate a new page
+				new_page();
+			}
+
+			m_mtx_middle.lock();
+
+			// copy to middle space
+			pointer32 p =
+				pointer32(m_use_space) +
+				m_use_offset;
+
+			// copy affected instrs to middle
+			pointer32 p_affected = p.offset(0);
+			p_affected.copy_from(
+				info.inline_general.affected_instrs,
+				info.inline_general.affected_instrs_size);
+			m_use_offset = m_use_offset +
+				info.inline_general.affected_instrs_size;
+
+			// fix jmp offset
+			size_t instr_offset = 0;
+			while (instr_offset < info.inline_general.affected_instrs_size)
+			{
+				pointer32 p_it = p_affected + instr_offset;
+				size_t instr_size = calc_instr_size(p_it);
+				bool is_jmp = is_jmp_instr(p_it);
+				if (is_jmp) // if is jmp and fix
+				{
+					if (instr_size > 2)
+					{	// 5 bytes jmp, fix jmp destination
+						uintptr_t dest = calc_jmp5_dest(
+							info.inline_general.func_src +
+							instr_offset,
+							p_it.offset(1).dword());
+
+						// fix op
+						p_it.offset(1) = calc_jmp5_op(p_it.v(), dest);
+					}
+					else
+					{
+						m_mtx_middle.unlock();
+						put_errorf("invalid jmp short. %s\n",
+							p_it.hex_string(instr_size).c_str());
+						throw "not supported at the moment.";
+					}
+				}
+
+				instr_offset = instr_offset + instr_size;
+			}
+
+			// copy shellcode
+			pointer32 p_shellcode = p_affected.offset(
+				info.inline_general.affected_instrs_size);
+			p_shellcode.copy_from(shellcode, shellcode_size);
+
+			// fix shellcode
+			p_shellcode.offset(2) =
+				func_src + info.inline_general.affected_instrs_size;
+			p_shellcode.offset(10) =
+				calc_jmp5_op(p_shellcode.offset(9).v(), func_handler);
+
+			m_mtx_middle.unlock();
+
+			m_use_offset = m_use_offset + shellcode_size + 10;
+
+			// add to maps
+			m_mtx_hooks.lock();
+			m_hooks.insert(std::pair<uintptr_t, st_hook>(func_src, info));
+			m_mtx_hooks.unlock();
+
+			// modify the source and jmp to destination
+			st_trampoline trampoline = calc_trampoline(func_src, p.v());
+			fk::auto_mem_protect auto_protect(func_src, sizeof(trampoline));
+			fk::pointer32(func_src).copy_from(&trampoline, sizeof(trampoline));
+			return this;
+		}
+
+		template <typename S>
 		hook_x86* remove_hook(S _func_src)
 		{
 			uintptr_t func_src = (uintptr_t)_func_src;
@@ -361,7 +656,8 @@ namespace fk
 		void restore_hook(st_hook& info)
 		{
 			if (info.type == inline_hook || 
-				info.type == inline_hook_obj)
+				info.type == inline_hook_obj ||
+				info.type == inline_general)
 			{
 				// restore source function
 				fk::auto_mem_protect auto_p(
@@ -372,6 +668,18 @@ namespace fk
 					info.inline_head.affected_instrs,
 					info.inline_head.affected_instrs_size
 				);
+			}
+			else if (info.type == inline_raw)
+			{
+				// restore source function
+				fk::auto_mem_protect auto_p(
+					info.inline_raw.func_src,
+					info.inline_raw.affected_instrs_size);
+				fk::pointer32(
+					info.inline_head.func_src).copy_from(
+						info.inline_raw.func_raw,
+						info.inline_raw.affected_instrs_size
+					);
 			}
 			else if (info.type == vtable_hook)
 			{
@@ -392,7 +700,9 @@ namespace fk
 			// Check remaining space
 			if (m_use_offset + 
 				size + 
-				(info.type == vtable_hook ? 0 : info.inline_head.affected_instrs_size + sizeof(st_trampoline)) +
+				(info.type == vtable_hook ? 0 : 
+					info.inline_head.affected_instrs_size + 
+					sizeof(st_trampoline)) +
 				10 > 
 				0x1000)
 			{

@@ -4,16 +4,67 @@
 #include <imgui_impl_win32.h>
 #include <d3d9.h>
 #include <tchar.h>
+#include <d3dx9.h>
+#include "imgui_memory_editor.h"
+
+#pragma comment(lib,"d3dx9.lib")
 
 static LPDIRECT3D9              g_pD3D = NULL;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = NULL;
 static D3DPRESENT_PARAMETERS    g_d3dpp = {};
+static IDirect3DSurface9* g_MouseCursor = NULL;
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void ResetDevice();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+HRESULT CreateCursor(IDirect3DDevice9* pd3dDevice)
+{
+    D3DXIMAGE_INFO ImageInfo;
+    D3DXGetImageInfoFromFileA("D:\\Cursor.png", &ImageInfo);
+
+    pd3dDevice->CreateOffscreenPlainSurface(ImageInfo.Width,
+        ImageInfo.Height,
+        ImageInfo.Format,
+        D3DPOOL_DEFAULT,
+        &g_MouseCursor,
+        NULL);
+
+    D3DXLoadSurfaceFromFileA(g_MouseCursor, NULL, NULL, "D:\\Cursor.png",
+        NULL, D3DX_FILTER_NONE, 0xFF000000, NULL);
+
+    //设置成指定的光标
+    pd3dDevice->SetCursorProperties(0, 0, g_MouseCursor);
+
+    //初试位置
+    pd3dDevice->SetCursorPosition(0, 0, D3DCURSOR_IMMEDIATE_UPDATE);
+
+    //显示光标
+    pd3dDevice->ShowCursor(true);
+
+    return 0;
+}
+
+/* COPIED FROM IMGUI DOCS OR IDK WHATS CALLED */
+// Simple helper function to load an image into a DX9 texture with common settings
+LPDIRECT3DTEXTURE9 LoadTextureFromFile(const char* filename, LPDIRECT3DTEXTURE9* out_texture, int* out_width, int* out_height, LPDIRECT3DDEVICE9 xD)
+{
+    // Load texture from disk
+    LPDIRECT3DTEXTURE9 pTexture;
+    HRESULT hr = D3DXCreateTextureFromFileA(xD, filename, &pTexture);
+    if (hr != S_OK)
+        return nullptr;
+
+    // Retrieve description of the texture surface so we can access its size
+    D3DSURFACE_DESC my_image_desc;
+    pTexture->GetLevelDesc(0, &my_image_desc);
+    *out_texture = pTexture;
+    *out_width = (int)my_image_desc.Width;
+    *out_height = (int)my_image_desc.Height;
+    return pTexture;
+}
 
 // Main code
 int imgui_main()
@@ -31,6 +82,12 @@ int imgui_main()
         ::UnregisterClass(wc.lpszClassName, wc.hInstance);
         return 1;
     }
+
+    //CreateCursor(g_pd3dDevice);
+
+    int my_image_width = 31;
+    int my_image_height = 31;
+    LPDIRECT3DTEXTURE9 my_texture = LoadTextureFromFile("G:\\轮子\\DX9HOOK\\Release\\3.png", &my_texture, &my_image_width, &my_image_height, g_pd3dDevice);
 
     // Show the window
     ::ShowWindow(hwnd, SW_SHOWDEFAULT);
@@ -96,6 +153,34 @@ int imgui_main()
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+        
+
+        //ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+        ImGui::Begin("DirectX9 Texture Test");
+
+        char test_buf[1024];
+        ImGui::InputTextMultiline(
+            "##item_list",
+            test_buf,
+            1024);
+
+        ImGui::Text("current cursor = %d", ImGui::GetMouseCursor());
+        ImGui::Text("pointer = %p", my_texture);
+        ImGui::Text("size = %d x %d", my_image_width, my_image_height);
+        ImGui::SliderInt("width", &my_image_width, 0, 100);
+        ImGui::SliderInt("height", &my_image_height, 0, 100);
+        ImGui::Image((void*)my_texture, ImVec2((float)my_image_width, (float)my_image_height));
+        ImGui::GetForegroundDrawList()->AddImage(my_texture, ImVec2(io.MousePos.x, io.MousePos.y), ImVec2(io.MousePos.x + my_image_width, io.MousePos.y + my_image_height));
+        ImGui::End();
+
+
+        //ImGui::Image();
+        //ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+        //ImGui::GetForegroundDrawList()->AddImage();
+
+        static MemoryEditor mem_edit;
+        mem_edit.DrawWindow("Memory Editor", GetModuleHandleA(NULL), 0x1000);
+
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
@@ -116,8 +201,12 @@ int imgui_main()
 
             if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
                 counter++;
+
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
+            ImGui::Text("GetCursorPos = %.2f,%.2f", io.MousePos.x, io.MousePos.y);
+            ImGui::Text("GetWindowPos = %.2f,%.2f", ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+            ImGui::Text("GetWindowSize = %.2f,%.2f", ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
@@ -182,7 +271,7 @@ bool CreateDeviceD3D(HWND hWnd)
     //g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;   // Present without vsync, maximum unthrottled framerate
     if (g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &g_d3dpp, &g_pd3dDevice) < 0)
         return false;
-
+    
     return true;
 }
 

@@ -72,7 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)third\imgui;$(ProjectDir)third\imgui\impl_dx9;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -110,6 +111,7 @@ copy "$(ProjectDir)fk_json.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_ldasm.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_hookx86.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_pointer.hpp" "$(SolutionDir)out\include" /y
+copy "$(ProjectDir)fk_window.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)fk_imgui_impl.hpp" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)third\imgui\imconfig.h" "$(SolutionDir)out\include" /y
 copy "$(ProjectDir)third\imgui\imgui.cpp" "$(SolutionDir)out\include" /y
@@ -141,6 +143,7 @@ copy "$(ProjectDir)fk_json.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_ldasm.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_hookx86.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_pointer.hpp" "$(VCToolsInstallDir)include" /y
+copy "$(ProjectDir)fk_window.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)fk_imgui_impl.hpp" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)third\imgui\imconfig.h" "$(VCToolsInstallDir)include" /y
 copy "$(ProjectDir)third\imgui\imgui.cpp" "$(VCToolsInstallDir)include" /y
@@ -398,6 +401,8 @@ copy "$(ProjectDir)third\imgui\impl_dx9\imgui_impl_win32.h" "$(VCToolsInstallDir
     <ClInclude Include="fk_pointer.hpp" />
     <ClInclude Include="fk_string.hpp" />
     <ClInclude Include="fk_json.hpp" />
+    <ClInclude Include="fk_window.hpp" />
+    <ClInclude Include="imgui_memory_editor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fk_inject.hpp" />

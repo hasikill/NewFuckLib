@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <io.h>
 #include "fk_string.hpp"
 
 #pragma warning(disable:4996)
@@ -22,9 +23,17 @@ namespace fk
 		file& open(const char* filename, const char* mode)
 		{
 			m_filename = filename;
+			m_mode = mode;
 			m_fp = fopen(filename, mode);
 			if (m_fp == nullptr)
 				throw "open file error";
+			return *this;
+		}
+
+		file& reopen()
+		{
+			close();
+			open(m_filename.c_str(), m_mode.c_str());
 			return *this;
 		}
 
@@ -113,6 +122,11 @@ namespace fk
 			return size;
 		}
 
+		bool exits()
+		{
+			return file::exits(m_filename.c_str());
+		}
+
 		file& flush()
 		{
 			fflush(m_fp);
@@ -142,9 +156,17 @@ namespace fk
 			return size;
 		}
 
+		static bool exits(const char* filename)
+		{
+			if (_access(filename, 0) == 0)
+				return true;
+			return false;
+		}
+
 	private:
 		FILE* m_fp = nullptr;
 		fk::string m_filename;
+		fk::string m_mode;
 
 		friend class log;
 	};

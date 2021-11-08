@@ -51,6 +51,12 @@
     <ClInclude Include="fk_pointer.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="fk_window.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_memory_editor.h">
+      <Filter>Source Files\example</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fk_inject.hpp">
