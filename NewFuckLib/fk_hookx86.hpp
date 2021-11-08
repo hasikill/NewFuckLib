@@ -677,7 +677,7 @@ namespace fk
 					info.inline_raw.affected_instrs_size);
 				fk::pointer32(
 					info.inline_head.func_src).copy_from(
-						info.inline_raw.func_raw,
+						info.inline_raw.func_raw + 1,
 						info.inline_raw.affected_instrs_size
 					);
 			}
