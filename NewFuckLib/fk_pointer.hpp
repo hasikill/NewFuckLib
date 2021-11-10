@@ -20,6 +20,12 @@ namespace fk
 			return this->p;
 		}
 
+		pointer& v_offset(int off)
+		{
+			this->p += off;
+			return *this;
+		}
+
 		template <typename T>
 		pointer& copy_to(T buffer, size_t size)
 		{

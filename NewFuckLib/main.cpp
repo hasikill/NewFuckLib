@@ -209,6 +209,9 @@ int main()
 	std::cout << j2.dump() << std::endl;
 	std::cout << j3.dump() << std::endl;
 
+	// file
+	printf("temp: %s\n", fk::file::temp_dir().c_str());
+
 	// disassemble
 	std::cout << "instr_size: " << fk::ldasm::obj().instr_size((void*)"\x64\xA1\x30\x00\x00\x00\x33\xC9\x89\x0D\xB4\x67\xE6\x77\x89\x0D\xB8\x67\xE6\x77\x88\x08\x38\x48\x02") << std::endl;
 

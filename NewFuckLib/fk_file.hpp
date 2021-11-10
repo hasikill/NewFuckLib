@@ -89,6 +89,7 @@ namespace fk
 					throw "read error.";
 				resuide -= read_size;
 			}
+			return *this;
 		}
 
 		file& read(char* data, size_t size)
@@ -163,6 +164,12 @@ namespace fk
 			return false;
 		}
 
+		static fk::string temp_dir()
+		{
+			char buf[MAX_PATH] = "\0";
+			GetTempPathA(MAX_PATH, buf);
+			return buf;
+		}
 	private:
 		FILE* m_fp = nullptr;
 		fk::string m_filename;
