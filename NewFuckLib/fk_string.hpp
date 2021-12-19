@@ -5,6 +5,8 @@
 #include <regex>
 #include <stdarg.h>
 #include <Windows.h>
+#include <codecvt>
+#include <iostream>
 
 namespace fk
 {
@@ -165,6 +167,44 @@ namespace fk
 			return ret;
 		}
 
+		fk::string trad2simple()
+		{
+			std::string strSimple;
+			if (size() == 0)
+				return "";
+
+			int nLen = size();
+			char* pBuffer = new char[nLen + 1]{ 0 };
+			if (pBuffer == nullptr)
+				return "";
+
+			LCMapStringA(2052, 33554432, c_str(), nLen, pBuffer, nLen);
+			strSimple = pBuffer;
+
+			if (pBuffer != nullptr)
+				delete[] pBuffer;
+
+			return strSimple;
+		}
+
+		std::wstring utf82unicode()
+		{
+			std::wstring ret;
+			try {
+				std::wstring_convert< std::codecvt_utf8<wchar_t> > wcv;
+				ret = wcv.from_bytes(*this);
+			}
+			catch (const std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
+			return ret;
+		}
+
+		fk::string utf82ansi()
+		{
+			return unic2ansi((wchar_t*)utf82unicode().c_str());
+		}
+
 	public:
 		template <typename T>
 		static fk::string fromnumber(T number)
@@ -184,6 +224,51 @@ namespace fk
 			fk::string strTmp = buffer;
 			delete buffer;
 			return strTmp;
+		}
+
+		static fk::string unic2ansi(wchar_t* wcsUnic)
+		{
+			std::string strAnsi;
+			//拿转换后的长度
+			int nNewLen = WideCharToMultiByte(
+				936,
+				512,
+				wcsUnic,
+				wcslen(wcsUnic),
+				0, 0, 0, FALSE);
+			if (nNewLen == 0)
+				return "";
+
+			char* pBuffer = new char[nNewLen + 1]{ 0 };
+			if (pBuffer == nullptr)
+				return "";
+
+			WideCharToMultiByte(
+				936,
+				512,
+				wcsUnic,
+				-1,
+				pBuffer, nNewLen, 0, FALSE);
+
+			//结果
+			strAnsi = pBuffer;
+			if (pBuffer != nullptr)
+				delete[] pBuffer;
+
+			return strAnsi;
+		}
+
+		static fk::string unicode2utf8(const std::wstring& wstr)
+		{
+			std::string ret;
+			try {
+				std::wstring_convert<std::codecvt_utf8<wchar_t>> wcv;
+				ret = wcv.to_bytes(wstr);
+			}
+			catch (const std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
+			return ret;
 		}
 	};
 }
