@@ -61,9 +61,23 @@ namespace fk
 			return *(uint8_t*)p;
 		}
 
+		uint8_t byte(uint8_t v)
+		{
+			auto res = *(uint8_t*)p;
+			*(uint8_t*)p = v;
+			return res;
+		}
+
 		uint16_t word()
 		{
 			return *(::uint16_t*)p;
+		}
+
+		uint16_t word(uint16_t v)
+		{
+			auto res = *(uint16_t*)p;
+			*(uint16_t*)p = v;
+			return res;
 		}
 
 		uint32_t dword()
@@ -71,9 +85,23 @@ namespace fk
 			return *(::uint32_t*)p;
 		}
 
+		uint32_t dword(uint32_t v)
+		{
+			auto res = *(uint32_t*)p;
+			*(uint32_t*)p = v;
+			return res;
+		}
+
 		uint64_t qword()
 		{
 			return *(::uint64_t*)p;
+		}
+
+		uint64_t qword(uint64_t v)
+		{
+			auto res = *(uint64_t*)p;
+			*(uint64_t*)p = v;
+			return res;
 		}
 
 		pointer ptr()
