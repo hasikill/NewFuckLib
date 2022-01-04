@@ -210,6 +210,33 @@ int imgui_main()
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
+
+
+            static char debug_buffer[1024 * 2];
+            static char filter_buffer[100];
+            static char contain_buffer[100];
+            static bool onoff;
+
+            ImGui::Begin("debug");
+            ImGui::InputTextMultiline(
+                "##debug",
+                debug_buffer,
+                1024 * 2,
+                { -1, -1 });
+            if (ImGui::BeginTable("cc", 3))
+            {
+                ImGui::TableNextColumn();
+                ImGui::Checkbox(u8"开关", &onoff);
+                ImGui::TableNextColumn();
+                ImGui::Checkbox(u8"过滤", &onoff);
+                ImGui::TableNextColumn();
+                ImGui::Checkbox(u8"包含", &onoff);
+                ImGui::EndTable();
+            }
+
+            ImGui::InputText(u8"过滤", filter_buffer, sizeof(filter_buffer));
+            ImGui::InputText(u8"包含", contain_buffer, sizeof(contain_buffer));
+            ImGui::End();
         }
 
         // 3. Show another simple window.
