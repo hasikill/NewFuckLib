@@ -177,13 +177,13 @@ namespace fk
 					0x8D, 0x74, 0x24, 0x24,
 					0x83, 0xEC, (uint8_t)(max_params * sizeof(intptr_t)),
 					0x89, 0xE7,
-					0xB9, (uint8_t)max_params - 1, 0x00, 0x00, 0x00,
+					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
 					0xF3, 0xA5,
 					0x83, 0xC4, 0x04,
 					0xE8, 0x00, 0x00, 0x00, 0x00,
 					0x89, 0xE6,
 					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x24),
-					0xB9, (uint8_t)max_params, 0x00, 0x00, 0x00,
+					0xB9, (uint8_t)max_params - 1, 0x00, 0x00, 0x00,
 					0xF3, 0xA5,
 					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t) - 4),
 					0x9D,
@@ -211,9 +211,9 @@ namespace fk
 					0x59,
 					0x89, 0x0C, 0x24,
 					0xE8, 0x00, 0x00, 0x00, 0x00,
-					0x8D, 0x74, 0X24, 0X04,
+					0x8D, 0x74, 0X24, 0x04,
 					0x8D, 0x7C, 0x24, (uint8_t)((max_params * sizeof(intptr_t)) + 0x28),
-					0xB9, (uint8_t)(max_params - 1), 0x00, 0x00, 0x00,
+					0xB9, (uint8_t)max_params - 1, 0x00, 0x00, 0x00,
 					0xF3, 0xA5,
 					0x83, 0xC4, (uint8_t)(max_params * sizeof(intptr_t)),
 					0x9D,
@@ -319,8 +319,9 @@ namespace fk
 					else
 					{
 						m_mtx_middle.unlock();
-						put_errorf("invalid jmp short. %s\n",
-							p_it.hex_string(instr_size).c_str());
+						put_errorf("invalid jmp short. %s %p\n",
+							p_it.hex_string(instr_size).c_str(),
+							_func_src);
 						throw "not supported at the moment.";
 					}
 				}
@@ -370,7 +371,6 @@ namespace fk
 			}
 			return (S)0;
 		}
-
 
 		template <typename O, typename H>
 		hook_x86* add_vtable_hook(
@@ -556,8 +556,9 @@ namespace fk
 					else
 					{
 						m_mtx_middle.unlock();
-						put_errorf("invalid jmp short. %s\n",
-							p_it.hex_string(instr_size).c_str());
+						put_errorf("invalid jmp short. %s %p\n",
+							p_it.hex_string(instr_size).c_str(),
+							func_src);
 						throw "not supported at the moment.";
 					}
 				}
@@ -773,8 +774,9 @@ namespace fk
 						else
 						{
 							m_mtx_middle.unlock();
-							put_errorf("invalid jmp short. %s\n",
-								p_it.hex_string(instr_size).c_str());
+							put_errorf("invalid jmp short. %s %p\n",
+								p_it.hex_string(instr_size).c_str(),
+								info.inline_head.func_src);
 							throw "not supported at the moment.";
 						}
 					}
