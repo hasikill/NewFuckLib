@@ -83,6 +83,21 @@ namespace fk
 			return resource_str;
 		}
 
+		fk::string getsubstr(const char* begin, const char* end)
+		{
+			auto begin_index = find(begin);
+			if (begin_index != -1)
+			{
+				begin_index = begin_index + strlen(begin);
+				auto end_index = find(end, begin_index);
+				if (end_index != -1)
+				{
+					return (*this)(begin_index, (end_index - begin_index));
+				}
+			}
+			return "";
+		}
+
 		fk::string prefix(const char* patterns)
 		{
 			fk::string res = "";
@@ -119,10 +134,54 @@ namespace fk
 			return res;
 		}
 
-		fk::string strtrim()
+		fk::string strtrimall()
 		{
 			std::regex re("\\s");
 			return std::regex_replace(*this, re, "");
+		}
+
+		fk::string strtrim()
+		{
+			if (!empty())
+			{
+				const char* begin = c_str();
+				const char* end = c_str() + size();
+
+				for (; begin != end;)
+				{
+					if (*begin == ' ' || *begin == '\t' || *begin == '\r' || *begin == '\n')
+					{
+						begin++;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				for (; begin != end;)
+				{
+					if (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r' || end[-1] == '\n')
+					{
+						end--;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				auto ch_size = end - begin;
+				if (end - begin > 0)
+				{
+					char* buf = new char[ch_size + 1] { 0 };
+					memcpy(buf, begin, ch_size);
+					fk::string str = buf;
+					delete[] buf;
+					return str;
+				}
+			}
+			return "";
 		}
 
 		fk::string hexstring(const char* patterns = " ", bool isupper = false)

@@ -108,6 +108,10 @@ int main()
 	std::cout << str(-1, 3) << std::endl;
 	std::cout << str(3, -1)(-1, 3) << std::endl;
 
+	// 取中间文本
+	str = "abcdefgh";
+	std::cout << str.getsubstr("cd", "gh");
+
 	// 字符串分割 和 去空白
 	fk::string str2 = str(3, -1)(-1, 3);
 	std::vector<fk::string> str_list = str2.split(",");
@@ -115,6 +119,10 @@ int main()
 	{
 		std::cout << s.strtrim() << std::endl;
 	}
+
+	// 去首尾空
+	auto t = fk::string(" da ").strtrim();
+	std::cout << t << std::endl;
 
 	// 字符串到数字的转换
 	printf("%d,%d,%f\n", str_list[0].number<int>(), str_list[1].number<int>(), str_list[2].number<float>());

@@ -141,7 +141,7 @@ namespace fk
 				}
 				put_successf("VirtualAllocEx mem = %p", mem);
 
-				if (WriteProcessMemory(hProcess, mem, (LPVOID)m_dllname.c_str(), m_dllname.size(), &BytesWritten))
+				if (WriteProcessMemory(hProcess, mem, (LPVOID)m_dllname.c_str(), m_dllname.size(), (SIZE_T*)&BytesWritten))
 				{
 					put_successf("WriteProcessMemory path = '%s'", m_dllname.c_str());
 
